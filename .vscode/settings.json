@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "buffer_pool.h": "c",
+    "file_io.h": "c",
+    "stdio.h": "c",
+    "types.h": "c",
+    "table.h": "c",
+    "block.h": "c",
+    "hash_map.h": "c"
+  },
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+}
