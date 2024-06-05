@@ -4,17 +4,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void init_buffer_pool(const char *filename, BufferPool *pool) {
-}
+// 打开filename，并关联pool为其缓冲池
+void init_buffer_pool(const char* filename, BufferPool* pool) {}
 
-void close_buffer_pool(BufferPool *pool) {
-}
+// 关闭缓冲池，将缓冲的页写回文件
+void close_buffer_pool(BufferPool* pool) {}
 
-Page *get_page(BufferPool *pool, off_t addr) {
-}
+// 获取地址为addr的页，并锁定（保证该页不会被意外换出）
+Page* get_page(BufferPool* pool, off_t addr) {}
 
-void release(BufferPool *pool, off_t addr) {
-}
+// 释放地址为addr的页，该页之后可以被换出
+void release(BufferPool* pool, off_t addr) {}
 
 /* void print_buffer_pool(BufferPool *pool) {
 } */

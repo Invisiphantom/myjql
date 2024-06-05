@@ -28,24 +28,24 @@ typedef struct {
     off_t table[HASH_MAP_BLOCK_SIZE];
 } HashMapBlock;
 
-/* BEGIN: --------------------------------- DO NOT MODIFY! --------------------------------- */
+/* if hash table has already existed,
+it will be re-opened and n_directory_blocks will be ignored */
+void hash_table_init(const char* filename, BufferPool* pool, off_t n_directory_blocks);
 
-/* if hash table has already existed, it will be re-opened and n_directory_blocks will be ignored */
-void hash_table_init(const char *filename, BufferPool *pool, off_t n_directory_blocks);
-
-void hash_table_close(BufferPool *pool);
+void hash_table_close(BufferPool* pool);
 
 /* there should not be no duplicate addr */
-void hash_table_insert(BufferPool *pool, short size, off_t addr);
+// 标记地址为addr的块有size的空闲空间
+void hash_table_insert(BufferPool* pool, short size, off_t addr);
 
 /* if there is no suitable block, return -1 */
-off_t hash_table_pop_lower_bound(BufferPool *pool, short size);
+// 返回至少包含size空闲空间的块地址
+off_t hash_table_pop_lower_bound(BufferPool* pool, short size);
 
 /* addr to be poped must exist */
-void hash_table_pop(BufferPool *pool, short size, off_t addr);
-
-/* END:   --------------------------------- DO NOT MODIFY! --------------------------------- */
+// 删除地址为addr的块的记录，该块有size的空闲空间
+void hash_table_pop(BufferPool* pool, short size, off_t addr);
 
 /* void print_hash_table(BufferPool *pool); */
 
-#endif  /* _HASH_MAP_H */
+#endif /* _HASH_MAP_H */

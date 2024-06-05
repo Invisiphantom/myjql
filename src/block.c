@@ -2,31 +2,38 @@
 
 #include <stdio.h>
 
-void init_block(Block *block) {
+// 初始化block
+void init_block(Block* block) {
     block->n_items = 0;
+    // 相对于block的偏移量
     block->head_ptr = (short)(block->data - (char*)block);
     block->tail_ptr = (short)sizeof(Block);
 }
 
-ItemPtr get_item(Block *block, short idx) {
+// 返回block第idx项Item的起始地址
+ItemPtr get_item(Block* block, short idx) {
+    // 超出idx范围
     if (idx < 0 || idx >= block->n_items) {
         printf("get item error: idx is out of range\n");
         return NULL;
     }
+    // 获取ItemID
     ItemID item_id = get_item_id(block, idx);
+    // 当前Item为空
     if (get_item_id_availability(item_id)) {
         printf("get item error: item_id is not used\n");
         return NULL;
     }
+    // 获取Item相对于块的偏移量
     short offset = get_item_id_offset(item_id);
     return (char*)block + offset;
 }
 
-short new_item(Block *block, ItemPtr item, short item_size) {
-}
+// 向block插入大小为item_size，起始地址为item的Item，返回插入后的项号（idx）
+short new_item(Block* block, ItemPtr item, short item_size) {}
 
-void delete_item(Block *block, short idx) {
-}
+// 删除block第idx项Item
+void delete_item(Block* block, short idx) {}
 
 /* void str_printer(ItemPtr item, short item_size) {
     if (item == NULL) {
@@ -75,7 +82,7 @@ void analyze_block(Block *block, block_stat_t *stat) {
             ++stat->empty_item_ids;
         }
     }
-    stat->available_space = block->tail_ptr - block->head_ptr 
+    stat->available_space = block->tail_ptr - block->head_ptr
         + stat->empty_item_ids * sizeof(ItemID);
 }
 
