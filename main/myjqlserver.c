@@ -1,25 +1,25 @@
 /*
  * myjql-server supports windows & linux (ubuntu)
- * 
+ *
  * Windows:
- * 
+ *
  * Socket:
  * https://docs.microsoft.com/en-us/windows/win32/winsock/complete-server-code
- * 
+ *
  * Signal Handler:
  * https://docs.microsoft.com/en-us/windows/console/registering-a-control-handler-function
- * 
+ *
  * Linux:
- * 
+ *
  * Socket:
  * https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
- * 
+ *
  * Thread:
  * https://man7.org/linux/man-pages/man3/pthread_create.3.html
- * 
+ *
  * Mutex:
  * https://www.geeksforgeeks.org/mutex-lock-for-linux-thread-synchronization/
- * 
+ *
  * Signal:
  * https://www.thegeekstuff.com/2012/03/catch-signals-sample-c-code
  */
@@ -73,17 +73,21 @@ pthread_mutex_t CriticalSection;
 #define SOCKET_ERROR -1
 #define SD_SEND SHUT_WR
 
-void closesocket(int fd) { close(fd); }
+void closesocket(int fd) {
+    close(fd);
+}
 
 void WSACleanup() {}
 
-int WSAGetLastError() { return 0; }
+int WSAGetLastError() {
+    return 0;
+}
 
-void EnterCriticalSection(pthread_mutex_t *mutex) {
+void EnterCriticalSection(pthread_mutex_t* mutex) {
     pthread_mutex_lock(mutex);
 }
 
-void LeaveCriticalSection(pthread_mutex_t *mutex) {
+void LeaveCriticalSection(pthread_mutex_t* mutex) {
     pthread_mutex_unlock(mutex);
 }
 
@@ -94,15 +98,14 @@ void LeaveCriticalSection(pthread_mutex_t *mutex) {
 #ifdef _WIN32
 DWORD WINAPI InstanceThread(LPVOID lpvParam)
 #else
-int InstanceThread(void *lpvParam);
+int InstanceThread(void* lpvParam);
 
-void *thread_start(void *lpvParam)
-{
+void* thread_start(void* lpvParam) {
     InstanceThread(lpvParam);
     return NULL;
 }
 
-int InstanceThread(void *lpvParam)
+int InstanceThread(void* lpvParam)
 #endif
 {
     int iResult;
@@ -119,7 +122,7 @@ int InstanceThread(void *lpvParam)
 
     printf("[%ld] InstanceThread created, receiving and processing messages.\n", threadId);
 
-    for (; ; ) {
+    for (;;) {
         iResult = recv(ClientSocket, (char*)&code, sizeof(code), 0);
         if (iResult == SOCKET_ERROR) {
             printf("[%ld] recv failed with error: %d\n", threadId, WSAGetLastError());
@@ -138,7 +141,7 @@ int InstanceThread(void *lpvParam)
                 closesocket(ClientSocket);
                 return 1;
             }
-            char *key = malloc(code + 1);
+            char* key = malloc(code + 1);
             iResult = recv(ClientSocket, key, code, 0);
             if (iResult == SOCKET_ERROR) {
                 printf("[%ld] recv failed with error: %d\n", threadId, WSAGetLastError());
@@ -160,7 +163,7 @@ int InstanceThread(void *lpvParam)
                     return 1;
                 }
             } else {
-                char *value = malloc(MAX_STR_LEN + 1);
+                char* value = malloc(MAX_STR_LEN + 1);
                 int value_len;
 
                 // Request ownership of the critical section.
@@ -178,7 +181,8 @@ int InstanceThread(void *lpvParam)
                     code = 0;
                     iResult = send(ClientSocket, (char*)&code, sizeof(code), 0);
                     if (iResult == SOCKET_ERROR) {
-                        printf("[%ld] send failed with error: %d\n", threadId, WSAGetLastError());
+                        printf("[%ld] send failed with error: %d\n", threadId,
+                               WSAGetLastError());
                         closesocket(ClientSocket);
                         free(key);
                         free(value);
@@ -189,20 +193,22 @@ int InstanceThread(void *lpvParam)
                     code = 1;
                     iResult = send(ClientSocket, (char*)&code, sizeof(code), 0);
                     if (iResult == SOCKET_ERROR) {
-                        printf("[%ld] send failed with error: %d\n", threadId, WSAGetLastError());
+                        printf("[%ld] send failed with error: %d\n", threadId,
+                               WSAGetLastError());
                         closesocket(ClientSocket);
                         free(key);
                         free(value);
                         return 1;
                     }
-                
+
                     // printf("[%ld] ret %d\n", threadId, code);
 
                     // value
                     code = value_len;
                     iResult = send(ClientSocket, (char*)&code, sizeof(code), 0);
                     if (iResult == SOCKET_ERROR) {
-                        printf("[%ld] send failed with error: %d\n", threadId, WSAGetLastError());
+                        printf("[%ld] send failed with error: %d\n", threadId,
+                               WSAGetLastError());
                         closesocket(ClientSocket);
                         free(key);
                         free(value);
@@ -210,7 +216,8 @@ int InstanceThread(void *lpvParam)
                     }
                     iResult = send(ClientSocket, value, code, 0);
                     if (iResult == SOCKET_ERROR) {
-                        printf("[%ld] send failed with error: %d\n", threadId, WSAGetLastError());
+                        printf("[%ld] send failed with error: %d\n", threadId,
+                               WSAGetLastError());
                         closesocket(ClientSocket);
                         free(key);
                         free(value);
@@ -237,7 +244,7 @@ int InstanceThread(void *lpvParam)
                 return 1;
             }
             int key_len = code;
-            char *key = malloc(code + 1);
+            char* key = malloc(code + 1);
             iResult = recv(ClientSocket, key, code, 0);
             if (iResult == SOCKET_ERROR) {
                 printf("[%ld] recv failed with error: %d\n", threadId, WSAGetLastError());
@@ -254,7 +261,7 @@ int InstanceThread(void *lpvParam)
                 return 1;
             }
             int value_len = code;
-            char *value = malloc(code + 1);
+            char* value = malloc(code + 1);
             iResult = recv(ClientSocket, value, code, 0);
             if (iResult == SOCKET_ERROR) {
                 printf("[%ld] recv failed with error: %d\n", threadId, WSAGetLastError());
@@ -289,7 +296,6 @@ int InstanceThread(void *lpvParam)
                     return 1;
                 }
             } else {
-
                 // Request ownership of the critical section.
                 EnterCriticalSection(&CriticalSection);
 
@@ -325,7 +331,7 @@ int InstanceThread(void *lpvParam)
                 closesocket(ClientSocket);
                 return 1;
             }
-            char *key = malloc(code + 1);
+            char* key = malloc(code + 1);
             iResult = recv(ClientSocket, key, code, 0);
             if (iResult == SOCKET_ERROR) {
                 printf("[%ld] recv failed with error: %d\n", threadId, WSAGetLastError());
@@ -347,7 +353,6 @@ int InstanceThread(void *lpvParam)
                     return 1;
                 }
             } else {
-
                 // Request ownership of the critical section.
                 EnterCriticalSection(&CriticalSection);
 
@@ -393,14 +398,13 @@ int InstanceThread(void *lpvParam)
     }
 
     closesocket(ClientSocket);
-    
+
     printf("[%ld] InstanceThread exiting.\n", threadId);
 
     return 0;
 }
 
-void exit_nicely()
-{
+void exit_nicely() {
     printf("Terminating server.\n");
 
     // Request ownership of the critical section.
@@ -429,52 +433,49 @@ void exit_nicely()
 
 #ifdef _WIN32
 
-BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
-{
-    switch (fdwCtrlType)
-    {
-        // Handle the CTRL-C signal.
-    case CTRL_C_EVENT:
-        printf("Ctrl-C event\n\n");
-        Beep(750, 300);
-        exit_nicely();
-        return TRUE;
+BOOL WINAPI CtrlHandler(DWORD fdwCtrlType) {
+    switch (fdwCtrlType) {
+            // Handle the CTRL-C signal.
+        case CTRL_C_EVENT:
+            printf("Ctrl-C event\n\n");
+            Beep(750, 300);
+            exit_nicely();
+            return TRUE;
 
-        // CTRL-CLOSE: confirm that the user wants to exit.
-    case CTRL_CLOSE_EVENT:
-        Beep(600, 200);
-        printf("Ctrl-Close event\n\n");
-        exit_nicely();
-        return TRUE;
+            // CTRL-CLOSE: confirm that the user wants to exit.
+        case CTRL_CLOSE_EVENT:
+            Beep(600, 200);
+            printf("Ctrl-Close event\n\n");
+            exit_nicely();
+            return TRUE;
 
-        // Pass other signals to the next handler.
-    case CTRL_BREAK_EVENT:
-        Beep(900, 200);
-        printf("Ctrl-Break event\n\n");
-        exit_nicely();
-        return FALSE;
+            // Pass other signals to the next handler.
+        case CTRL_BREAK_EVENT:
+            Beep(900, 200);
+            printf("Ctrl-Break event\n\n");
+            exit_nicely();
+            return FALSE;
 
-    case CTRL_LOGOFF_EVENT:
-        Beep(1000, 200);
-        printf("Ctrl-Logoff event\n\n");
-        exit_nicely();
-        return FALSE;
+        case CTRL_LOGOFF_EVENT:
+            Beep(1000, 200);
+            printf("Ctrl-Logoff event\n\n");
+            exit_nicely();
+            return FALSE;
 
-    case CTRL_SHUTDOWN_EVENT:
-        Beep(750, 500);
-        printf("Ctrl-Shutdown event\n\n");
-        exit_nicely();
-        return FALSE;
+        case CTRL_SHUTDOWN_EVENT:
+            Beep(750, 500);
+            printf("Ctrl-Shutdown event\n\n");
+            exit_nicely();
+            return FALSE;
 
-    default:
-        return FALSE;
+        default:
+            return FALSE;
     }
 }
 
 #else
 
-void CtrlHandler(int signo)
-{
+void CtrlHandler(int signo) {
     if (signo == SIGINT) {
         printf("Ctrl-C event\n\n");
         exit_nicely();
@@ -483,8 +484,7 @@ void CtrlHandler(int signo)
 
 #endif
 
-int main(void)
-{
+int main(void) {
     int iResult;
 
 #ifdef _WIN32
@@ -493,18 +493,18 @@ int main(void)
 
     SOCKET ClientSocket = INVALID_SOCKET;
 
-    struct addrinfo *result = NULL;
+    struct addrinfo* result = NULL;
     struct addrinfo hints;
 
     HANDLE hThread = NULL;
-    DWORD  dwThreadId = 0;
+    DWORD dwThreadId = 0;
 
 #else
 
     int ClientSocket;
 
     int clilen;
-    int *arg;
+    int* arg;
 
     struct sockaddr_in serv_addr, cli_addr;
 
@@ -591,12 +591,12 @@ int main(void)
 
     /* Initialize socket structure */
     bzero((char*)&serv_addr, sizeof(serv_addr));
-    
+
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(DEFAULT_PORT);
-   
-   /* Now bind the host address using bind() call.*/
+
+    /* Now bind the host address using bind() call.*/
     iResult = bind(ListenSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
     if (iResult < 0) {
         printf("bind failed\n");
@@ -606,7 +606,7 @@ int main(void)
     /* Now start listening for the clients, here process will
      * go in sleep mode and will wait for the incoming connection
      */
-    
+
     listen(ListenSocket, 128);
 
 #endif
@@ -635,7 +635,7 @@ int main(void)
     myjql_init();
     printf("Main thread: myjql_init\n");
 
-    for (; ; ) {
+    for (;;) {
         printf("\nSocket Server: Main thread awaiting client connection\n");
 
 #ifdef _WIN32
@@ -661,14 +661,13 @@ int main(void)
 
 #ifdef _WIN32
 
-        // Create a thread for this client. 
-        hThread = CreateThread( 
-            NULL,                   // no security attribute 
-            0,                      // default stack size 
-            InstanceThread,         // thread proc
-            (LPVOID) ClientSocket,  // thread parameter 
-            0,                      // not suspended 
-            &dwThreadId);           // returns thread ID 
+        // Create a thread for this client.
+        hThread = CreateThread(NULL,                  // no security attribute
+                               0,                     // default stack size
+                               InstanceThread,        // thread proc
+                               (LPVOID)ClientSocket,  // thread parameter
+                               0,                     // not suspended
+                               &dwThreadId);          // returns thread ID
 
         if (hThread == NULL) {
             printf("CreateThread failed, GLE=%d.\n", GetLastError());
@@ -684,8 +683,7 @@ int main(void)
         *arg = ClientSocket;
 
         // Create a thread for this client.
-        iResult = pthread_create(&hThread, NULL,
-                                 &thread_start, arg);
+        iResult = pthread_create(&hThread, NULL, &thread_start, arg);
 
         if (iResult != 0) {
             printf("pthread_create failed\n");
@@ -695,7 +693,6 @@ int main(void)
         }
 
 #endif
-
     }
 
     // We won't reach this line.

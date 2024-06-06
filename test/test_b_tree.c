@@ -10,12 +10,12 @@ typedef long long my_off_t;
 typedef long my_off_t;
 #endif
 
-void init();
+void m_init();
 void insert(my_off_t addr, short idx);
 void erase(my_off_t addr);
 short get_idx(my_off_t addr);
 int contain(my_off_t addr);
-size_t get_total();
+size_t m_get_total();
 my_off_t get_addr(int idx);
 
 RID get_rand_rid() {
@@ -58,7 +58,7 @@ int test(int num_op, int out)
     BufferPool pool;
     b_tree_init("zztest-b-tree", &pool);
 
-    init();
+    m_init();
 
     for (i = 0; i < num_op; ++i) {
         op = rand() % 3;
@@ -73,8 +73,8 @@ int test(int num_op, int out)
             }
             b_tree_insert(&pool, rid, &rid_row_row_cmp, &insert_handler);
             insert(get_rid_block_addr(rid), get_rid_idx(rid));
-        } else if (op == 1 && get_total() != 0) {  /* erase */
-            get_rid_block_addr(rid) = get_addr(rand() % (int)get_total());
+        } else if (op == 1 && m_get_total() != 0) {  /* erase */
+            get_rid_block_addr(rid) = get_addr(rand() % (int)m_get_total());
             get_rid_idx(rid) = 0;
             if (out) {
                 printf("erase: ");
@@ -84,8 +84,8 @@ int test(int num_op, int out)
             b_tree_delete(&pool, rid, &rid_row_row_cmp, &insert_handler, &delete_handler);
             erase(get_rid_block_addr(rid));
         } else {  /* find */
-            if (rand() % 2 && get_total() != 0) {
-                get_rid_block_addr(rid) = get_addr(rand() % (int)get_total());
+            if (rand() % 2 && m_get_total() != 0) {
+                get_rid_block_addr(rid) = get_addr(rand() % (int)m_get_total());
             } else {
                 rid = get_rand_rid();
             }

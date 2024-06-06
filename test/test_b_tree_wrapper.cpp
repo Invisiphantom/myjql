@@ -11,7 +11,7 @@ typedef long my_off_t;
 
 map<my_off_t, short> m;
 
-extern "C" void init() {
+extern "C" void m_init() {
     m.clear();
 }
 
@@ -40,7 +40,7 @@ extern "C" int contain(my_off_t addr) {
     return m.count(addr) != 0;
 }
 
-extern "C" size_t get_total() {
+extern "C" size_t m_get_total() {
     return m.size();
 }
 

@@ -7,12 +7,11 @@
 #define CACHE_PAGE 8
 
 typedef struct {
-    /* you can modify anything in this struct */
-    FileInfo file;
-    Page pages[CACHE_PAGE];
-    off_t addrs[CACHE_PAGE];
-    size_t cnt[CACHE_PAGE];
-    size_t ref[CACHE_PAGE];
+    FileInfo file; // 文件信息
+    Page pages[CACHE_PAGE]; // 页数组
+    off_t addrs[CACHE_PAGE]; // 地址数组
+    size_t cnt[CACHE_PAGE]; // 计数数组
+    size_t ref[CACHE_PAGE]; // 引用数组
 } BufferPool;
 
 // 打开filename，并关联pool为其缓冲池

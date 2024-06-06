@@ -3,11 +3,12 @@
 
 #include "file_io.h"
 
+// 页块
 typedef struct {
     /* header section */
-    short n_items;   // 已分配的项数
-    short head_ptr;  // 空闲空间的头指针(偏移量)
-    short tail_ptr;  // 空闲空间的尾指针(偏移量)
+    short n_items;                             // 已分配的项数
+    short head_ptr;                            // 空闲空间的头指针(偏移量)
+    short tail_ptr;                            // 空闲空间的尾指针(偏移量)
     char data[PAGE_SIZE - 3 * sizeof(short)];  //  空闲空间(对齐PAGE_SIZE)
 } Block;
 
@@ -21,8 +22,8 @@ typedef struct {
  * 14~0  bit: size   项大小  (15bits)
  */
 
-typedef unsigned int ItemID; // 32bit
-typedef char* ItemPtr; // 8bit
+typedef unsigned int ItemID;  // 32bit
+typedef char* ItemPtr;        // 8bit
 
 #define get_item_id_availability(item_id) (((item_id) >> 30) & 1)
 #define get_item_id_offset(item_id) (((item_id) >> 15) & ((1 << 15) - 1))
@@ -48,24 +49,29 @@ short new_item(Block* block, ItemPtr item, short item_size);
 // 删除block第idx项Item
 void delete_item(Block* block, short idx);
 
-/* if item is NULL, print NULL */
-/* typedef void (*printer_t)(ItemPtr item, short item_size); */
+// 用于打印item的函数类型
+typedef void (*printer_t)(ItemPtr item, short item_size);
 
-/* void str_printer(ItemPtr item, short item_size); */
+// 用字符串形式打印Item
+void str_printer(ItemPtr item, short item_size);
 
-/* void print_block(Block *block, printer_t printer); */
+// 打印块的属性及内容
+void print_block(Block* block, printer_t printer);
 
-/* typedef struct { */
-/*     size_t empty_item_ids; */
-/*     size_t total_item_ids; */
-/* tail_ptr - head_ptr + empty_item_ids * sizeof(ItemID) */
-/*     size_t available_space; */
-/* } block_stat_t; */
+// 块的状态信息
+typedef struct {
+    size_t empty_item_ids; // 空闲Item数
+    size_t total_item_ids; // 总的Item数
+    size_t available_space; // 空闲空间大小
+} block_stat_t;
 
-/* void analyze_block(Block *block, block_stat_t *stat); */
+// 获取块的状态信息
+void analyze_block(Block* block, block_stat_t* stat);
 
-/* void accumulate_stat_info(block_stat_t *stat, const block_stat_t *stat2); */
+// 累加块的状态信息 stat += stat2
+void accumulate_stat_info(block_stat_t* stat, const block_stat_t* stat2);
 
-/* void print_stat_info(const block_stat_t *stat); */
+// 打印块的状态信息
+void print_stat_info(const block_stat_t* stat);
 
 #endif /* _BLOCK_H */

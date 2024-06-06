@@ -3,21 +3,19 @@
 #include <set>
 #include <map>
 using namespace std;
-#ifdef _WIN32
-typedef long long my_off_t;
-#else
+
 typedef long my_off_t;
-#endif
+
 vector<set<my_off_t>> v;
 map<my_off_t, short> m;
-extern "C" void init(size_t size)
-{
+
+extern "C" void m_init(size_t size) {
     v.clear();
     m.clear();
     v.resize(size);
 }
-extern "C" void add(short size, my_off_t id)
-{
+
+extern "C" void m_add(short size, my_off_t id) {
     if (v[size].count(id)) {
         std::terminate();
     }
@@ -27,8 +25,8 @@ extern "C" void add(short size, my_off_t id)
     v[size].insert(id);
     m[id] = size;
 }
-extern "C" void erase(short size, my_off_t id)
-{
+
+extern "C" void m_erase(short size, my_off_t id) {
     if (!v[size].count(id)) {
         std::terminate();
     }
@@ -38,24 +36,27 @@ extern "C" void erase(short size, my_off_t id)
     v[size].erase(id);
     m.erase(id);
 }
-extern "C" int contain(short size, my_off_t id)
-{
+
+extern "C" int m_contain(short size, my_off_t id) {
     return v[size].count(id) != 0;
 }
-extern "C" int empty(short size)
-{
+
+extern "C" int m_empty(short size) {
     return v[size].empty();
 }
-extern "C" short get_size(my_off_t id) {
+
+extern "C" short m_get_size(my_off_t id) {
     if (!m.count(id)) {
         std::terminate();
     }
     return m[id];
 }
-extern "C" size_t get_total() {
+
+extern "C" size_t m_get_total() {
     return m.size();
 }
-extern "C" my_off_t get_item(int idx) {
+
+extern "C" my_off_t m_get_item(int idx) {
     auto it = m.begin();
     for (int i = 0; i < idx; ++i) {
         ++it;
