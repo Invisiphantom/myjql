@@ -7,14 +7,15 @@
 #include <assert.h>
 
 // 打开filename，并关联pool为其缓冲池
-void init_buffer_pool(const char* filename, BufferPool* pool) {
-    open_file(&pool->file, filename);
+FileIOResult init_buffer_pool(const char* filename, BufferPool* pool) {
+    FileIOResult res = open_file(&pool->file, filename);
     // 初始化age为最大值, ref为0
     for (int i = 0; i < CACHE_PAGE; i++) {
         pool->addrs[i] = -1;
         pool->age[i] = SIZE_MAX;
         pool->ref[i] = 0;
     }
+    return res;
 }
 
 // 关闭缓冲池，将缓冲的页写回文件
@@ -75,7 +76,7 @@ Page* get_page(BufferPool* pool, off_t addr) {
 void release(BufferPool* pool, off_t addr) {
     for (int i = 0; i < CACHE_PAGE; i++) {
         if (pool->addrs[i] == addr) {
-            if(pool->ref[i] == 0) {
+            if (pool->ref[i] == 0) {
                 fprintf(stderr, "release: ref=0 can't --\n");
                 assert(0);
             }

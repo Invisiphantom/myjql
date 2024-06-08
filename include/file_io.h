@@ -24,6 +24,8 @@ typedef struct {
 } Page;
 
 typedef enum {
+    FILE_OPEN,          // 文件存在并且成功打开
+    FILE_CREAT,         // 文件不存在但成功创建
     FILE_IO_SUCCESS,    // 打开文件成功
     FILE_IO_FAILED,     // 打开文件失败
     INVALID_LEN,        // 文件长度不是 PAGE_SIZE 的整数倍

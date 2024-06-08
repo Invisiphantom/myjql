@@ -6,13 +6,17 @@
 #include <assert.h>
 
 FileIOResult open_file(FileInfo* file, const char* filename) {
+    int res;
     if (file->fp = fopen(filename, "rb+")) {
         /* 文件存在并且成功打开 */
+        res = FILE_OPEN;
     } else if (file->fp = fopen(filename, "wb+")) {
         /* 文件不存在但成功创建 */
+        res = FILE_CREAT;
     } else {
         return FILE_IO_FAILED;
     }
+    
     // 文件指针移动到末尾
     if (fseek(file->fp, 0, SEEK_END)) {
         return FILE_IO_FAILED;
@@ -24,7 +28,7 @@ FileIOResult open_file(FileInfo* file, const char* filename) {
         close_file(file);
         return INVALID_LEN;
     }
-    return FILE_IO_SUCCESS;
+    return res;
 }
 
 FileIOResult close_file(FileInfo* file) {
@@ -37,8 +41,14 @@ FileIOResult close_file(FileInfo* file) {
 // 读入位于addr的page
 FileIOResult read_page(Page* page, FileInfo* file, off_t addr) {
     // 如果addr==文件大小，则追加新的页
+    if(file->length & PAGE_MASK) {
+        fprintf(stderr, "read_page: file->length未对齐 %ld\n", file->length);
+        assert(0);
+    }
     if (addr == file->length) {
         file->length += PAGE_SIZE;
+        if(file->length == 49495)
+            assert(0);
     }
     // 地址是 PAGE_SIZE 的整数倍
     if (addr & PAGE_MASK) {

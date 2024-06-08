@@ -15,7 +15,7 @@ typedef struct {
 } BufferPool;
 
 // 打开filename，并关联pool为其缓冲池
-void init_buffer_pool(const char* filename, BufferPool* pool);
+FileIOResult init_buffer_pool(const char* filename, BufferPool* pool);
 
 // 关闭缓冲池，将缓冲的页写回文件
 void close_buffer_pool(BufferPool* pool);

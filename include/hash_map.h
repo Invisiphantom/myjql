@@ -3,27 +3,25 @@
 
 #include "buffer_pool.h"
 
-// .fsm文件 Free Space Map 空闲空间映射
-
-// 哈希控制块(空闲链表)
+// 哈希控制块
 typedef struct {
+    off_t max_size;            // 最大目录项数
     off_t free_block_head;     // 空闲块链表头指针
     off_t n_directory_blocks;  // 第1~n_directory_blocks块是哈希目录块
-    off_t max_size;
 } HashMapControlBlock;
 
 // 一页块可存放的目录项数  sizeof(off_t)=8字节 -> 16项
 #define HASH_MAP_DIR_BLOCK_SIZE (PAGE_SIZE / sizeof(off_t))
 
-// 哈希目录页块(非空闲链表)  保存每个起始非空闲块页地址
+// 哈希目录页块
 typedef struct {
-    off_t directory[HASH_MAP_DIR_BLOCK_SIZE];
+    off_t directory[HASH_MAP_DIR_BLOCK_SIZE]; // 非空闲链表头指针
 } HashMapDirectoryBlock;
 
-// 哈希数据块数目  去掉next和n_items后的数目
+// 一页块可存放的地址项数 (去掉next和n_items)
 #define HASH_MAP_BLOCK_SIZE ((PAGE_SIZE - 2 * sizeof(off_t)) / sizeof(off_t))
 
-// 哈希数据块
+// 哈希映射块
 typedef struct {
     off_t next;     // 下一个块的地址
     off_t n_items;  // 该块中的空闲空间数目

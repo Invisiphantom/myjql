@@ -3,33 +3,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
-#define MAX_ADDR_SIZE 512000
+#define MAX_ADDR_SIZE 38400
 #define MAX_DIR_PAGE MAX_ADDR_SIZE / HASH_MAP_DIR_BLOCK_SIZE
 
 // 如果哈希表已经存在，则重新打开, 否则初始化
 void hash_table_init(const char* filename, BufferPool* pool, off_t n_directory_blocks) {
-    // 初始化缓冲区
-    init_buffer_pool(filename, pool);
+    FileIOResult res = init_buffer_pool(filename, pool);
+    if (res == FILE_OPEN) {  // 如果哈希表已经存在，则重新打开
+        printf("Hash table already exists, reopen\n");
+        return;
+    }
 
     // 初始化哈希控制块
     HashMapControlBlock* ctrl = (HashMapControlBlock*)get_page(pool, 0);  //* 锁定控制块
-    // TODO 如果哈希表已经存在，则重新打开
-    // if (ctrl->n_directory_blocks != 0) {
-    //     release(pool, 0);  //* 释放控制块
-    //     return;
-    // }
     ctrl->max_size = n_directory_blocks * HASH_MAP_DIR_BLOCK_SIZE;
     ctrl->free_block_head = (n_directory_blocks + 1) * PAGE_SIZE;
+    ctrl->n_directory_blocks = n_directory_blocks;
     release(pool, 0);  //* 释放控制块
 
     // 初始化目录块
     for (off_t i = 1; i <= n_directory_blocks; i++) {
         HashMapDirectoryBlock* dir_block =
             (HashMapDirectoryBlock*)get_page(pool, i * PAGE_SIZE);  //* 锁定目录块
-        for (int j = 0; j < HASH_MAP_DIR_BLOCK_SIZE; j++) {
-            dir_block->directory[j] = 0;
-        }
+        memset(dir_block->directory, 0, sizeof(dir_block->directory));
         release(pool, i * PAGE_SIZE);  //* 释放目录块
     }
 
@@ -38,6 +36,7 @@ void hash_table_init(const char* filename, BufferPool* pool, off_t n_directory_b
         HashMapBlock* hash_block =
             (HashMapBlock*)get_page(pool, fb_i * PAGE_SIZE);  //* 锁定哈希块
         hash_block->next = (fb_i + 1) * PAGE_SIZE;
+        hash_block->n_items = 0;
         release(pool, fb_i * PAGE_SIZE);  //* 释放哈希块
     }
 }
@@ -52,16 +51,14 @@ void hash_table_close(BufferPool* pool) {
 // 从空闲块链表中分配一个块
 off_t hash_table_alloc(BufferPool* pool) {
     HashMapControlBlock* ctrl = (HashMapControlBlock*)get_page(pool, 0);  //* 锁定
-    if (ctrl->free_block_head == 0) {
-        release(pool, 0);  //* 释放
+    if (ctrl->free_block_head == 0) { // 如果没有空闲块
         fprintf(stderr, "No free block\n");
-        exit(1);
+        assert(0);
     }
     off_t block_addr = ctrl->free_block_head;
     HashMapBlock* hash_block = (HashMapBlock*)get_page(pool, block_addr);  //* 锁定
     ctrl->free_block_head = hash_block->next;
     hash_block->next = 0;
-    hash_block->n_items = 0;
     release(pool, block_addr);  //* 释放
     release(pool, 0);           //* 释放
     return block_addr;
@@ -69,14 +66,14 @@ off_t hash_table_alloc(BufferPool* pool) {
 
 // 释放地址为addr的块到空闲块链表
 void hash_table_free(BufferPool* pool, off_t addr) {
-    // 地址是 PAGE_SIZE 的整数倍
     if (addr & PAGE_MASK) {
-        printf("read_page: addr未对齐: %ld\n", addr);
+        printf("hash_table_free: addr未对齐: %ld\n", addr);
         assert(0);
     }
     HashMapControlBlock* ctrl = (HashMapControlBlock*)get_page(pool, 0);  //* 锁定
     HashMapBlock* hash_block = (HashMapBlock*)get_page(pool, addr);       //* 锁定
     hash_block->next = ctrl->free_block_head;
+    hash_block->n_items = 0;
     ctrl->free_block_head = addr;
     release(pool, addr);  //* 释放
     release(pool, 0);     //* 释放
@@ -101,6 +98,7 @@ void hash_table_insert(BufferPool* pool, short size, off_t addr) {
         release(pool, (size / HASH_MAP_DIR_BLOCK_SIZE + 1) * PAGE_SIZE);  //* 释放目录块
         return;
     }
+
     HashMapBlock* hash_block = (HashMapBlock*)get_page(pool, curAddr);  //* 锁定
     // 获取最后一个哈希块
     off_t nextAddr = hash_block->next;
