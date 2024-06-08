@@ -3,6 +3,7 @@
 #include "file_io.h"
 
 #include <stdio.h>
+#include <assert.h>
 
 FileIOResult open_file(FileInfo* file, const char* filename) {
     if (file->fp = fopen(filename, "rb+")) {
@@ -34,13 +35,21 @@ FileIOResult close_file(FileInfo* file) {
 }
 
 // 读入位于addr的page
-FileIOResult read_page(Page* page, const FileInfo* file, off_t addr) {
+FileIOResult read_page(Page* page, FileInfo* file, off_t addr) {
+    // 如果addr==文件大小，则追加新的页
+    if (addr == file->length) {
+        file->length += PAGE_SIZE;
+    }
     // 地址是 PAGE_SIZE 的整数倍
     if (addr & PAGE_MASK) {
+        printf("read_page: addr未对齐: %ld\n", addr);
+        assert(0);
         return INVALID_ADDR;
     }
     // 地址在文件范围内
     if (addr < 0 || addr >= file->length) {
+        printf("read_page: addr超出范围: %ld\n", addr);
+        assert(0);
         return ADDR_OUT_OF_RANGE;
     }
     // 移动文件指针到addr
@@ -58,12 +67,20 @@ FileIOResult read_page(Page* page, const FileInfo* file, off_t addr) {
 
 // 将page写出至addr，若addr==文件大小，则追加新的页
 FileIOResult write_page(const Page* page, FileInfo* file, off_t addr) {
+    // 如果addr==文件大小，则追加新的页
+    if (addr == file->length) {
+        file->length += PAGE_SIZE;
+    }
     // 地址是 PAGE_SIZE 的整数倍
     if (addr & PAGE_MASK) {
+        printf("write_page: addr未对齐: %ld\n", addr);
+        assert(0);
         return INVALID_ADDR;
     }
     // 地址在文件范围内
     if (addr < 0 || addr > file->length) {
+        printf("write_page: addr超出范围: %ld\n", addr);
+        assert(0);
         return ADDR_OUT_OF_RANGE;
     }
     // 移动文件指针到addr
@@ -74,10 +91,6 @@ FileIOResult write_page(const Page* page, FileInfo* file, off_t addr) {
     size_t bytes_written = fwrite(page, PAGE_SIZE, 1, file->fp);
     if (bytes_written != 1) {
         return FILE_IO_FAILED;
-    }
-    // 如果addr==文件大小，则追加新的页
-    if (addr == file->length) { /* append new page in the end*/
-        file->length += PAGE_SIZE;
     }
     return FILE_IO_SUCCESS;
 }

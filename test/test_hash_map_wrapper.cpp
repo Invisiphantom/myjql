@@ -6,8 +6,8 @@ using namespace std;
 
 typedef long my_off_t;
 
-vector<set<my_off_t>> v;
-map<my_off_t, short> m;
+vector<set<my_off_t>> v; // 目录-块集
+map<my_off_t, short> m; // 块-空闲空间大小
 
 extern "C" void m_init(size_t size) {
     v.clear();
@@ -15,6 +15,7 @@ extern "C" void m_init(size_t size) {
     v.resize(size);
 }
 
+// 标记地址为id的块有size的空闲空间
 extern "C" void m_add(short size, my_off_t id) {
     if (v[size].count(id)) {
         std::terminate();
@@ -58,8 +59,8 @@ extern "C" size_t m_get_total() {
 
 extern "C" my_off_t m_get_item(int idx) {
     auto it = m.begin();
-    for (int i = 0; i < idx; ++i) {
-        ++it;
+    for (int i = 0; i < idx; i++) {
+        it++;
     }
     return it->first;
 }

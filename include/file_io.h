@@ -20,7 +20,7 @@ typedef struct {
 } FileInfo;
 
 typedef struct {
-    char data[PAGE_SIZE]; // 占位对齐 PAGE_SIZE
+    char data[PAGE_SIZE];  // 占位对齐 PAGE_SIZE
 } Page;
 
 typedef enum {
@@ -31,12 +31,14 @@ typedef enum {
     ADDR_OUT_OF_RANGE,  // 地址位置超出文件范围
 } FileIOResult;
 
+// 打开文件，如果文件不存在则创建
 FileIOResult open_file(FileInfo* file, const char* filename);
 
+// 关闭文件
 FileIOResult close_file(FileInfo* file);
 
 // 读入位于addr的page
-FileIOResult read_page(Page* page, const FileInfo* file, off_t addr);
+FileIOResult read_page(Page* page, FileInfo* file, off_t addr);
 
 // 将page写出至addr，若addr==文件大小，则追加新的页
 FileIOResult write_page(const Page* page, FileInfo* file, off_t addr);

@@ -12,10 +12,10 @@ typedef struct {
     off_t max_size;
 } HashMapControlBlock;
 
-// 一页可存放的哈希目录块数目  sizeof(off_t)=8字节
+// 一页块可存放的目录项数  sizeof(off_t)=8字节 -> 16项
 #define HASH_MAP_DIR_BLOCK_SIZE (PAGE_SIZE / sizeof(off_t))
 
-// 一页哈希目录块(非空闲链表)  保存每个起始非空闲块页地址
+// 哈希目录页块(非空闲链表)  保存每个起始非空闲块页地址
 typedef struct {
     off_t directory[HASH_MAP_DIR_BLOCK_SIZE];
 } HashMapDirectoryBlock;
@@ -30,18 +30,22 @@ typedef struct {
     off_t table[HASH_MAP_BLOCK_SIZE];
 } HashMapBlock;
 
-/* if hash table has already existed,
-it will be re-opened and n_directory_blocks will be ignored */
+// 如果哈希表已经存在，则重新打开, 否则初始化
 void hash_table_init(const char* filename, BufferPool* pool, off_t n_directory_blocks);
 
+// 关闭哈希表
 void hash_table_close(BufferPool* pool);
 
-/* there should not be no duplicate addr */
+// 从空闲块链表中分配一个块
+off_t hash_table_alloc(BufferPool* pool);
+
+// 释放地址为addr的块到空闲块链表
+void hash_table_free(BufferPool* pool, off_t addr);
+
 // 标记地址为addr的块有size的空闲空间
 void hash_table_insert(BufferPool* pool, short size, off_t addr);
 
-/* if there is no suitable block, return -1 */
-// 返回至少包含size空闲空间的块地址
+// 弹出至少包含size空闲空间的块地址, 如果没有则返回-1
 off_t hash_table_pop_lower_bound(BufferPool* pool, short size);
 
 /* addr to be poped must exist */
