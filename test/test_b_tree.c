@@ -142,8 +142,8 @@ int test(int num_op, int out)
 int main()
 {
     printf("PAGE_SIZE = %d\n", PAGE_SIZE);
-    printf("DEGREE = " FORMAT_SIZE_T "\n", DEGREE);
-    printf("BNode size: " FORMAT_SIZE_T "\n", sizeof(BNode));
+    printf("DEGREE = " "%ld" "\n", DEGREE);
+    printf("BNode size: " "%ld" "\n", sizeof(BNode));
     if (DEGREE < 2) {
         printf("error: DEGREE < 2\n");
         return 1;

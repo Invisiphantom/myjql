@@ -97,8 +97,8 @@ void accumulate_stat_info(block_stat_t* stat, const block_stat_t* stat2) {
 // 打印块的状态信息
 void print_stat_info(const block_stat_t* stat) {
     printf("==========STAT==========\n");
-    printf("empty_item_ids: " FORMAT_SIZE_T "\n", stat->empty_item_ids);
-    printf("total_item_ids: " FORMAT_SIZE_T "\n", stat->total_item_ids);
-    printf("available_space: " FORMAT_SIZE_T "\n", stat->available_space);
+    printf("empty_item_ids: " "%ld" "\n", stat->empty_item_ids);
+    printf("total_item_ids: " "%ld" "\n", stat->total_item_ids);
+    printf("available_space: " "%ld" "\n", stat->available_space);
     printf("========================\n");
 }

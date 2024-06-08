@@ -2,10 +2,8 @@
 #define _BUFFER_POOL_H
 
 #include "file_io.h"
-// 文件读写调用file_io.h中的读写函数
 
-#define CACHE_PAGE 8
-
+#define CACHE_PAGE 16
 typedef struct {
     FileInfo file; // 文件信息
     Page pages[CACHE_PAGE]; // 页数组

@@ -48,7 +48,7 @@ void print_table(Table* table, printer_t printer) {
     for (off_t i = 0; i < total; i++) {
         off_t block_addr = i * PAGE_SIZE;  // 第i个页块的地址
         Block* block = (Block*)get_page(&table->data_pool, block_addr);  //* 锁定
-        printf("[" FORMAT_OFF_T "]\n", block_addr);
+        printf("[" "%ld" "]\n", block_addr);
         print_block(block, printer);             // 打印每个页块
         release(&table->data_pool, block_addr);  //* 释放
     }
@@ -59,7 +59,7 @@ void print_table(Table* table, printer_t printer) {
 
 // 打印 RID.block_addr 和 RID.idx
 void print_rid(RID rid) {
-    printf("RID(" FORMAT_OFF_T ", %d)", get_rid_block_addr(rid), get_rid_idx(rid));
+    printf("RID(" "%ld" ", %d)", get_rid_block_addr(rid), get_rid_idx(rid));
 }
 
 // 获取全局表的统计信息
@@ -78,8 +78,8 @@ void analyze_table(Table* table) {
         accumulate_stat_info(&stat_sum, &curr);  // 累加每个块的状态信息
     }
     printf("----------ANALYSIS----------\n");
-    printf("total blocks: " FORMAT_OFF_T "\n", total);
-    printf("total size: " FORMAT_OFF_T "\n", total_size);
+    printf("total blocks: " "%ld" "\n", total);
+    printf("total size: " "%ld" "\n", total_size);
     printf("total occupancy: %.4f\n", 1.0f - 1.0f * stat_sum.available_space / total_size);
     printf("ItemID非空率: %.4f\n",
            1.0f - 1.0f * stat_sum.empty_item_ids / stat_sum.total_item_ids);

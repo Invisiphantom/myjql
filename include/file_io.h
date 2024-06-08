@@ -5,14 +5,7 @@
 #include <sys/types.h>
 
 #define PAGE_SIZE 128
-// #define PAGE_SIZE 64
-
 #define PAGE_MASK (PAGE_SIZE - 1)
-
-/* off_t {long int} */
-#define FORMAT_OFF_T "%ld"
-/* size_t {long unsigned int} */
-#define FORMAT_SIZE_T "%ld"
 
 typedef struct {
     FILE* fp;      // 文件指针
@@ -20,7 +13,7 @@ typedef struct {
 } FileInfo;
 
 typedef struct {
-    char data[PAGE_SIZE];  // 占位对齐 PAGE_SIZE
+    char data[PAGE_SIZE];
 } Page;
 
 typedef enum {
@@ -39,10 +32,10 @@ FileIOResult open_file(FileInfo* file, const char* filename);
 // 关闭文件
 FileIOResult close_file(FileInfo* file);
 
-// 读入位于addr的page
+// 读入位于addr的page, 若addr==文件大小，则追加新的页
 FileIOResult read_page(Page* page, FileInfo* file, off_t addr);
 
-// 将page写出至addr，若addr==文件大小，则追加新的页
+// 将page写出至addr
 FileIOResult write_page(const Page* page, FileInfo* file, off_t addr);
 
 #endif /* _FILE_IO_H */

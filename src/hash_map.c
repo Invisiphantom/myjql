@@ -66,10 +66,7 @@ off_t hash_table_alloc(BufferPool* pool) {
 
 // 释放地址为addr的块到空闲块链表
 void hash_table_free(BufferPool* pool, off_t addr) {
-    if (addr & PAGE_MASK) {
-        printf("hash_table_free: addr未对齐: %ld\n", addr);
-        assert(0);
-    }
+    assert((addr & PAGE_MASK) == 0);
     HashMapControlBlock* ctrl = (HashMapControlBlock*)get_page(pool, 0);  //* 锁定
     HashMapBlock* hash_block = (HashMapBlock*)get_page(pool, addr);       //* 锁定
     hash_block->next = ctrl->free_block_head;
@@ -236,7 +233,7 @@ void print_hash_table(BufferPool* pool) {
                     if (j != 0)
                         printf(", ");
                     // 打印当前哈希非空闲块的所有空间地址
-                    printf(FORMAT_OFF_T, block->table[j]);
+                    printf("%ld", block->table[j]);
                 }
                 printf("}");
                 off_t next_addr = block->next;

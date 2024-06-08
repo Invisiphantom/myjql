@@ -10,15 +10,15 @@ typedef struct {
     off_t n_directory_blocks;  // 第1~n_directory_blocks块是哈希目录块
 } HashMapControlBlock;
 
-// 一页块可存放的目录项数  sizeof(off_t)=8字节 -> 16项
+// 目录页块可存放的目录项数
 #define HASH_MAP_DIR_BLOCK_SIZE (PAGE_SIZE / sizeof(off_t))
 
 // 哈希目录页块
 typedef struct {
-    off_t directory[HASH_MAP_DIR_BLOCK_SIZE]; // 非空闲链表头指针
+    off_t directory[HASH_MAP_DIR_BLOCK_SIZE]; // 工作链表头指针
 } HashMapDirectoryBlock;
 
-// 一页块可存放的地址项数 (去掉next和n_items)
+// 哈希映射块可存放的地址项数 (去掉next和n_items)
 #define HASH_MAP_BLOCK_SIZE ((PAGE_SIZE - 2 * sizeof(off_t)) / sizeof(off_t))
 
 // 哈希映射块
