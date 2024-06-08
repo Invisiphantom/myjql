@@ -5,10 +5,9 @@
 
 // 页块
 typedef struct {
-    /* header section */
     short n_items;                             // 已分配的项数
-    short head_ptr;                            // 空闲空间的头指针(偏移量)
-    short tail_ptr;                            // 空闲空间的尾指针(偏移量)
+    short head_offset;                         // 空闲空间的头偏移量
+    short tail_offset;                         // 空闲空间的尾偏移量
     char data[PAGE_SIZE - 3 * sizeof(short)];  //  空闲空间(对齐PAGE_SIZE)
 } Block;
 
@@ -40,16 +39,15 @@ typedef char* ItemPtr;        // 8bit
 // 初始化block
 void init_block(Block* block);
 
-// 返回block第idx项Item的起始地址
+// 返回block中第idx项Item的起始地址
 ItemPtr get_item(Block* block, short idx);
 
-// 向block插入大小为item_size，起始地址为item的Item，返回插入后的项号（idx）
-short new_item(Block* block, ItemPtr item, short item_size);
+// 向block插入大小为size的src, 返回插入后的项号(idx)
+short new_item(Block* block, char* src, short size);
 
 // 删除block第idx项Item
 void delete_item(Block* block, short idx);
 
-// 用于打印item的函数类型
 typedef void (*printer_t)(ItemPtr item, short item_size);
 
 // 用字符串形式打印Item
@@ -60,9 +58,9 @@ void print_block(Block* block, printer_t printer);
 
 // 块的状态信息
 typedef struct {
-    size_t empty_item_ids; // 空闲Item数
-    size_t total_item_ids; // 总的Item数
-    size_t available_space; // 空闲空间大小
+    size_t empty_item_ids;   // 空闲Item数
+    size_t total_item_ids;   // 总的Item数
+    size_t available_space;  // 空闲空间大小
 } block_stat_t;
 
 // 获取块的状态信息

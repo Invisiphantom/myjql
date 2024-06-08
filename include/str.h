@@ -6,13 +6,11 @@
 #define STR_CHUNK_MAX_SIZE ((PAGE_SIZE) / 4) // chunk最大大小
 #define STR_CHUNK_MAX_LEN (STR_CHUNK_MAX_SIZE - sizeof(RID) - sizeof(short)) // chunk.data最大长度
 
-// 文件存储
 typedef struct {
     /*
-     * strings are split into chunks organized in singly linked list
-     * RID rid: next chunk
-     * short size: size of the current chunk
-     * char data[]: chunk data (of variable length)
+     * RID rid: 下一个chunk的rid
+     * short size: 当前chunk长度
+     * char data[]: 变长字符串
      */
     char data[STR_CHUNK_MAX_SIZE];
 } StringChunk;
@@ -20,21 +18,20 @@ typedef struct {
 #define get_str_chunk_rid(chunk) (*(RID*)(chunk)) // chunk.rid
 #define get_str_chunk_size(chunk) (*(short*)(((char*)(chunk)) + sizeof(RID))) // chunk.size
 #define get_str_chunk_data_ptr(chunk) (((char*)(chunk)) + sizeof(RID) + sizeof(short)) // chunk.data
-#define calc_str_chunk_size(len) ((len) + sizeof(RID) + sizeof(short)) // 计算chunk大小
+#define calc_str_chunk_size(len) (sizeof(RID) + sizeof(short) + (len)) // 计算chunk大小
 
-// 内存存储
 typedef struct {
-    StringChunk chunk; // 当前对应的块
-    short idx;         // 当前对应的块内索引
+    StringChunk chunk; // 当前对应的chunk
+    short idx;         // 下一个字符的位置
 } StringRecord;
 
-// 根据rid，获取对应字符串的chunk和idx
+// 根据rid，获取对应字符串首位的chunk和idx
 void read_string(Table* table, RID rid, StringRecord* record);
 
 // 判断record是否还有下一个字符
 int has_next_char(StringRecord* record);
 
-// 获取record的下一个字符
+// 更新record, 返回下一个字符
 char next_char(Table* table, StringRecord* record);
 
 int compare_string_record(Table* table, const StringRecord* a, const StringRecord* b);

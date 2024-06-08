@@ -10,6 +10,7 @@ typedef struct {
     short idx;
 } my_RID;
 
+// (addr, idx) -> string
 map<pair<my_off_t, short>, string> m;
 
 extern "C" void m_init() {

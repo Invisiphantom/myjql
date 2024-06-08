@@ -64,6 +64,10 @@ FileIOResult read_page(Page* page, FileInfo* file, off_t addr) {
 
 // 将page写出至addr
 FileIOResult write_page(const Page* page, FileInfo* file, off_t addr) {
+    // 如果addr==文件大小，则追加新的页
+    if (addr == file->length)
+        file->length += PAGE_SIZE;
+
     if (addr & PAGE_MASK) {
         printf("write_page: addr未对齐: %ld\n", addr);
         assert(0);

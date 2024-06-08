@@ -8,12 +8,12 @@
 // 全局表
 typedef struct {
     BufferPool data_pool;  // 数据缓冲区
-    BufferPool fsm_pool;   // 哈希块缓冲区
+    BufferPool fsm_pool;   // 哈希映射缓冲区
 } Table;
 
 typedef struct {
-    // off_t block_addr,
-    // short idx
+    // off_t block_addr  块地址
+    // short idx         块内item索引
     char data[sizeof(off_t) + sizeof(short)];  // 强制对齐10字节
 } RID;
 
@@ -33,10 +33,10 @@ off_t table_get_total_blocks(Table* table);
 short table_block_get_total_items(Table* table, off_t block_addr);
 
 // 根据rid，将数据读入dest，需要确保dest拥有适当的大小
-void table_read(Table* table, RID rid, ItemPtr dest);
+void table_read(Table* table, RID rid, char* dest);
 
 // 插入大小为size，起始地址为src的Item，返回rid
-RID table_insert(Table* table, ItemPtr src, short size);
+RID table_insert(Table* table, char* src, short size);
 
 // 根据rid，删除相应Item
 void table_delete(Table* table, RID rid);
