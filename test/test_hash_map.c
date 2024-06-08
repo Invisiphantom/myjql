@@ -18,7 +18,8 @@ size_t m_get_total();
 my_off_t m_get_item(int idx);
 
 // if (test(1000, 256, 512, 512, 512, 256, 256, 0)) {
-int test(int num_rep,  // 循环次数 1000
+int test(int test,     // 测试
+         int num_rep,  // 循环次数 1000
          int num_pos,  // 插入备选位置数 256
 
          int num_ins1,     // 插入操作数 512
@@ -42,7 +43,7 @@ int test(int num_rep,  // 循环次数 1000
     m_init(max_val);  // v.resize(max_val);
     printf("max_val = %d\n", max_val);
     for (int rep = 0; rep < num_rep && !flag; rep++) {
-        printf("rep = %d\n", rep);
+        printf("test=$d, rep = %d\n", test, rep);
         //* step 1: select a number of positions to insert a number of addrs
         for (int i = 0; i < num_pos; i++) {
             pos[i] = rand() % max_val;  // 空闲空间大小
@@ -218,31 +219,31 @@ int main() {
 
     // printf("test 1\n");
     // printf(pt_ptr, 1, 2, 4, 4, 4, 2, 4);
-    // if (test(1, 2, 4, 4, 4, 2, 4, 1)) {
+    // if (test(1, 1, 2, 4, 4, 4, 2, 4, 1)) {
     //     return 1;
     // }
 
     printf("test 2\n");
     printf(pt_ptr, 10000, 10, 40, 40, 40, 20, 20);
-    if (test(10000, 10, 40, 40, 40, 20, 20, 0)) {
+    if (test(2, 10000, 10, 40, 40, 40, 20, 20, 0)) {
         return 1;
     }
 
     printf("test 3\n");
     printf(pt_ptr, 1000, 256, 512, 512, 512, 256, 256);
-    if (test(1000, 256, 512, 512, 512, 256, 256, 0)) {
+    if (test(3, 1000, 256, 512, 512, 512, 256, 256, 0)) {
         return 1;
     }
 
     printf("test 4\n");
     printf(pt_ptr, 100000, 1, 1, 1, 1, 1, 0);
-    if (test(100000, 1, 1, 1, 1, 1, 1, 0)) {
+    if (test(4, 100000, 1, 1, 1, 1, 1, 1, 0)) {
         return 1;
     }
 
     printf("test 5\n");
     printf(pt_ptr, 100000, 2, 2, 1, 2, 1, 1);
-    if (test(100000, 2, 2, 1, 2, 1, 1, 0)) {
+    if (test(5, 100000, 2, 2, 1, 2, 1, 1, 0)) {
         return 1;
     }
 
