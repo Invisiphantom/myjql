@@ -199,7 +199,7 @@ int main() {
     }
 
     printf("test 2\n");
-    printf(pt_ptr, 10000, 10, 40, 40, 40, 20, 20);
+    printf(pt_ptr, 5000, 10, 40, 40, 40, 20, 20);
     if (test(2, 10000, 10, 40, 40, 40, 20, 20, 0)) {
         return 1;
     }

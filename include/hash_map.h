@@ -15,7 +15,7 @@ typedef struct {
 
 // 哈希目录页块
 typedef struct {
-    off_t directory[HASH_MAP_DIR_BLOCK_SIZE]; // 工作链表头指针
+    off_t directory[HASH_MAP_DIR_BLOCK_SIZE];  // 工作链表头指针
 } HashMapDirectoryBlock;
 
 // 哈希映射块可存放的地址项数 (去掉next和n_items)
@@ -46,7 +46,6 @@ void hash_table_insert(BufferPool* pool, short size, off_t addr);
 // 弹出至少包含size空闲空间的块地址, 如果没有则返回-1
 off_t hash_table_pop_lower_bound(BufferPool* pool, short size);
 
-/* addr to be poped must exist */
 // 删除地址为addr的块的记录，该块有size的空闲空间
 void hash_table_pop(BufferPool* pool, short size, off_t addr);
 
