@@ -33,7 +33,7 @@ char random_char() {
 }
 
 int generate_string(int n) {
-    int len = rand() % n;
+    int len = rand() % (n - 1) + 1;
     int i;
     for (i = 0; i < len; ++i)
         buf[i] = random_char();
@@ -50,6 +50,7 @@ int test(int max_str_len, int num_op, int out) {
     table_init(&table, "zztest-str.data", "zztest-str.fsm");
 
     for (int i = 0; i < num_op; ++i) {
+        printf("op %d\n", i);
         int op = rand() % 3;
         int m_size = m_get_total();
 
@@ -93,7 +94,7 @@ int test(int max_str_len, int num_op, int out) {
             m_erase(m_rid);
         }
 
-        //* write
+        //* insert
         else {
             int len = generate_string(max_str_len);  // 没有计算\0长度
             RID rid = write_string(&table, buf, len);
@@ -120,14 +121,16 @@ int test(int max_str_len, int num_op, int out) {
 int main() {
     srand(0);
     printf("BEGIN OF TEST\n");
+    char* print_str = "max_str_len=%d, num_op=%d, out=%d\n";
 
-    if (test(10, 30, 1)) {
-        return 1;
-    }
-
-    // if (test(512, 10000, 0)) {
+    printf(print_str, 10, 30, 1);
+    // if (test(10, 30, 1)) {
     //     return 1;
     // }
+
+    if (test(512, 10000, 0)) {
+        return 1;
+    }
 
     printf("END OF TEST\n");
     return 0;

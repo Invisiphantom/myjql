@@ -3,8 +3,8 @@
 
 #include "table.h"
 
-#define STR_CHUNK_MAX_SIZE ((PAGE_SIZE) / 4) // chunk最大大小
-#define STR_CHUNK_MAX_LEN (STR_CHUNK_MAX_SIZE - sizeof(RID) - sizeof(short)) // chunk.data最大长度
+#define STR_CHUNK_MAX_SIZE ((PAGE_SIZE) / 4) // chunk最大大小 32
+#define STR_CHUNK_MAX_LEN (STR_CHUNK_MAX_SIZE - sizeof(RID) - sizeof(short)) // chunk.data最大长度 20
 
 typedef struct {
     /*
@@ -18,7 +18,7 @@ typedef struct {
 #define get_str_chunk_rid(chunk) (*(RID*)(chunk)) // chunk.rid
 #define get_str_chunk_size(chunk) (*(short*)(((char*)(chunk)) + sizeof(RID))) // chunk.size
 #define get_str_chunk_data_ptr(chunk) (((char*)(chunk)) + sizeof(RID) + sizeof(short)) // chunk.data
-#define calc_str_chunk_size(len) (sizeof(RID) + sizeof(short) + (len)) // 计算chunk大小
+#define calc_str_chunk_size(len) (sizeof(RID) + sizeof(short) + (len)) // 计算chunk大小 12+len
 
 typedef struct {
     StringChunk chunk; // 当前对应的chunk

@@ -19,7 +19,7 @@ ItemPtr get_item(Block* block, short idx) {
         assert(0);
     }
     ItemID item_id = get_item_id(block, idx);  // 32bit
-    if (get_item_id_availability(item_id)) {
+    if (get_item_id_availability(item_id) == 1) {
         printf("get_item: ItemID指向为空\n");
         assert(0);
     }
@@ -31,13 +31,23 @@ ItemPtr get_item(Block* block, short idx) {
 // 向block插入大小为size的src, 返回插入后的项号(idx)
 short new_item(Block* block, char* src, short size) {
     short free_space = block->tail_offset - block->head_offset;
-    if(sizeof(ItemID) + size > free_space) {
+    if (sizeof(ItemID) + size > free_space) {
         printf("new_item: 空间不足\n");
         assert(0);
     }
     block->tail_offset -= size;
     short offset = block->tail_offset;
-    ItemID item_id = compose_item_id(1, offset, size);
+    ItemID item_id = compose_item_id(0, offset, size);
+
+    // 如果中间有空的ItemID
+    // for (int i = 0; i < block->n_items; i++)
+    //     if (get_item_id_availability(get_item_id(block, i)) == 1) {
+    //         get_item_id(block, i) = item_id;
+    //         memcpy((char*)block + offset, src, size);
+    //         return i;
+    //     }
+
+    // 如果没有可用的ItemID, 则在末尾插入
     memcpy((char*)block + block->head_offset, &item_id, sizeof(ItemID));
     memcpy((char*)block + offset, src, size);
     block->head_offset += sizeof(ItemID);
@@ -58,9 +68,23 @@ void delete_item(Block* block, short idx) {
     }
     short offset = get_item_id_offset(item_id);
     short size = get_item_id_size(item_id);
+    get_item_id(block, idx) = compose_item_id(1, 0, 0);
 
-    block->n_items--;
-    block->head_offset -= sizeof(ItemID);
+    if (idx < block->n_items - 1) {
+        // 将前面的Item向后移动size位
+        char temp_buf[PAGE_SIZE];
+        memcpy(temp_buf, (char*)block + block->tail_offset, offset - block->tail_offset);
+        memcpy((char*)block + block->tail_offset + size, temp_buf,
+               offset - block->tail_offset);
+
+        // 更新ItemID的offset, 向后移动size位
+        for (int i = idx + 1; i < block->n_items; i++) {
+            short temp_aval = get_item_id_availability(get_item_id(block, i));
+            short temp_offset = get_item_id_offset(get_item_id(block, i));
+            short temp_size = get_item_id_size(get_item_id(block, i));
+            get_item_id(block, i) = compose_item_id(temp_aval, temp_offset + size, temp_size);
+        }
+    }
     block->tail_offset += size;
     return;
 }
@@ -80,7 +104,7 @@ void str_printer(ItemPtr item, short item_size) {
 // 打印块的属性及内容
 void print_block(Block* block, printer_t printer) {
     printf("----------BLOCK----------\n");
-    printf("total = %d\n", block->n_items);  // 已分配的项数
+    printf("total = %d\n", block->n_items);     // 已分配的项数
     printf("head = %d\n", block->head_offset);  // 空闲空间的头指针(偏移量)
     printf("tail = %d\n", block->tail_offset);  // 空闲空间的尾指针(偏移量)
     for (short idx = 0; idx < block->n_items; idx++) {

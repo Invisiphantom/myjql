@@ -3,6 +3,8 @@
 #include <map>
 using namespace std;
 
+#include <assert.h>
+
 typedef long my_off_t;
 
 typedef struct {
@@ -18,6 +20,10 @@ extern "C" void m_init() {
 }
 
 extern "C" void m_insert(my_RID rid, char* s) {
+    if (rid.addr == -1) {
+        fprintf(stderr, "Invalid rid=-1\n");
+        assert(0);
+    }
     pair<my_off_t, short> p{rid.addr, rid.idx};
     if (m.count(p)) {
         std::terminate();
