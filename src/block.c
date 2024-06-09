@@ -68,23 +68,28 @@ void delete_item(Block* block, short idx) {
     }
     short offset = get_item_id_offset(item_id);
     short size = get_item_id_size(item_id);
-    get_item_id(block, idx) = compose_item_id(1, 0, 0);
+    get_item_id(block, idx) = compose_item_id(1, -1, -1);
 
     if (idx < block->n_items - 1) {
         // 将前面的Item向后移动size位
         char temp_buf[PAGE_SIZE];
+        assert(offset >= block->tail_offset);
         memcpy(temp_buf, (char*)block + block->tail_offset, offset - block->tail_offset);
         memcpy((char*)block + block->tail_offset + size, temp_buf,
                offset - block->tail_offset);
 
         // 更新ItemID的offset, 向后移动size位
-        for (int i = idx + 1; i < block->n_items; i++) {
-            short temp_aval = get_item_id_availability(get_item_id(block, i));
+        for (int i = 0; i < block->n_items; i++) {
             short temp_offset = get_item_id_offset(get_item_id(block, i));
-            short temp_size = get_item_id_size(get_item_id(block, i));
-            get_item_id(block, i) = compose_item_id(temp_aval, temp_offset + size, temp_size);
+            short temp_aval = get_item_id_availability(get_item_id(block, i));
+            if (temp_offset < offset && temp_aval == 0) {
+                short temp_size = get_item_id_size(get_item_id(block, i));
+                get_item_id(block, i) =
+                    compose_item_id(temp_aval, temp_offset + size, temp_size);
+            }
         }
     }
+
     block->tail_offset += size;
     return;
 }

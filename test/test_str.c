@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <assert.h>
 
 #include "table.h"
 #include "str.h"
@@ -45,12 +46,13 @@ int generate_string(int n) {
 // max_str_len=512, num_op=10000, out=0
 int test(int max_str_len, int num_op, int out) {
     int flag = 0;
+    m_init();
 
     Table table;
     table_init(&table, "zztest-str.data", "zztest-str.fsm");
-
-    for (int i = 0; i < num_op; ++i) {
-        printf("op %d\n", i);
+    for (int i = 0; i < num_op; i++) {
+        // if (i % 100 == 0)
+            printf("op %d\n", i);
         int op = rand() % 3;
         int m_size = m_get_total();
 
@@ -73,8 +75,9 @@ int test(int max_str_len, int num_op, int out) {
             buf[n] = 0;
             // 如果buf和m_rid对应的字符串不相等
             if (m_equal(m_rid, buf) == 0) {
-                printf("* error\n");
+                printf("* read: error\n");
                 flag = 1;
+                assert(0);
                 break;
             }
         }
@@ -121,12 +124,10 @@ int test(int max_str_len, int num_op, int out) {
 int main() {
     srand(0);
     printf("BEGIN OF TEST\n");
-    char* print_str = "max_str_len=%d, num_op=%d, out=%d\n";
 
-    printf(print_str, 10, 30, 1);
-    // if (test(10, 30, 1)) {
-    //     return 1;
-    // }
+    if (test(10, 30, 1)) {
+        return 1;
+    }
 
     if (test(512, 10000, 0)) {
         return 1;
