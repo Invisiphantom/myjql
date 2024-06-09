@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <string.h>
 
-#define MAX_ADDR_SIZE 51200
+#define MAX_ADDR_SIZE 204800
 #define MAX_DIR_PAGE MAX_ADDR_SIZE / HASH_MAP_DIR_BLOCK_SIZE
 
 // 如果哈希表已经存在，则重新打开, 否则初始化
@@ -103,9 +103,10 @@ void hash_table_insert(BufferPool* pool, short size, off_t addr) {
         curAddr = tempAddr;
         hash_block = (HashMapBlock*)get_page(pool, curAddr);  //* 锁定新块
         tempAddr = hash_block->next;
+        assert(tempAddr != 147988);
     }
 
-    // 如果末尾哈希快已满, 则新建空哈希块
+    // 如果末尾哈希块已满, 则新建空哈希块
     if (hash_block->n_items == HASH_MAP_BLOCK_SIZE) {
         off_t newAddr = hash_table_alloc(pool);
         hash_block->next = newAddr;

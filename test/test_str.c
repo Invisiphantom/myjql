@@ -34,7 +34,7 @@ char random_char() {
 }
 
 int generate_string(int n) {
-    int len = rand() % (n - 1) + 1;
+    int len = rand() % n;
     int i;
     for (i = 0; i < len; ++i)
         buf[i] = random_char();

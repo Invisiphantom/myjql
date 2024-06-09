@@ -44,6 +44,12 @@ int compare_string_record(Table* table, const StringRecord* a, const StringRecor
 RID write_string(Table* table, const char* data, off_t size) {
     RID next_rid;
     get_rid_block_addr(next_rid) = -1;
+    if (size == 0) {
+        StringChunk chunk;
+        get_str_chunk_rid(&chunk) = next_rid;
+        get_str_chunk_size(&chunk) = calc_str_chunk_size(0);
+        return table_insert(table, chunk.data, get_str_chunk_size(&chunk));
+    }
     while (size > 0) {
         StringChunk chunk;
         get_str_chunk_rid(&chunk) = next_rid;
