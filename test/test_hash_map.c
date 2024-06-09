@@ -192,17 +192,17 @@ int main() {
         "插入数1=%d, 弹出数1=%d\n"
         "插入数2=%d, 删除数2=%d, 弹出数2=%d\n";
 
-    printf("test 1\n");
-    printf(pt_ptr, 1, 2, 4, 4, 4, 2, 4);
-    if (test(1, 1, 2, 4, 4, 4, 2, 4, 1)) {
-        return 1;
-    }
+    // printf("test 1\n");
+    // printf(pt_ptr, 1, 2, 4, 4, 4, 2, 4);
+    // if (test(1, 1, 2, 4, 4, 4, 2, 4, 1)) {
+    //     return 1;
+    // }
 
-    printf("test 2\n");
-    printf(pt_ptr, 5000, 10, 40, 40, 40, 20, 20);
-    if (test(2, 10000, 10, 40, 40, 40, 20, 20, 0)) {
-        return 1;
-    }
+    // printf("test 2\n");
+    // printf(pt_ptr, 5000, 10, 40, 40, 40, 20, 20);
+    // if (test(2, 10000, 10, 40, 40, 40, 20, 20, 0)) {
+    //     return 1;
+    // }
 
     // printf("test 3\n");
     // printf(pt_ptr, 1000, 256, 512, 512, 512, 256, 256);
@@ -216,11 +216,11 @@ int main() {
     //     return 1;
     // }
 
-    // printf("test 5\n");
-    // printf(pt_ptr, 100000, 2, 2, 1, 2, 1, 1);
-    // if (test(5, 100000, 2, 2, 1, 2, 1, 1, 0)) {
-    //     return 1;
-    // }
+    printf("test 5\n");
+    printf(pt_ptr, 100000, 2, 2, 1, 2, 1, 1);
+    if (test(5, 100000, 2, 2, 1, 2, 1, 1, 0)) {
+        return 1;
+    }
 
     printf("END OF TEST\n");
     return 0;

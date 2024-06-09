@@ -35,17 +35,18 @@ short new_item(Block* block, char* src, short size) {
         printf("new_item: 空间不足\n");
         assert(0);
     }
+
     block->tail_offset -= size;
     short offset = block->tail_offset;
     ItemID item_id = compose_item_id(0, offset, size);
 
     // 如果中间有空的ItemID
-    // for (int i = 0; i < block->n_items; i++)
-    //     if (get_item_id_availability(get_item_id(block, i)) == 1) {
-    //         get_item_id(block, i) = item_id;
-    //         memcpy((char*)block + offset, src, size);
-    //         return i;
-    //     }
+    for (int idx = 0; idx < block->n_items; idx++)
+        if (get_item_id_availability(get_item_id(block, idx)) == 1) {
+            get_item_id(block, idx) = item_id;
+            memcpy((char*)block + offset, src, size);
+            return idx;
+        }
 
     // 如果没有可用的ItemID, 则在末尾插入
     memcpy((char*)block + block->head_offset, &item_id, sizeof(ItemID));
@@ -70,23 +71,19 @@ void delete_item(Block* block, short idx) {
     short size = get_item_id_size(item_id);
     get_item_id(block, idx) = compose_item_id(1, -1, -1);
 
-    if (idx < block->n_items - 1) {
-        // 将前面的Item向后移动size位
-        char temp_buf[PAGE_SIZE];
-        assert(offset >= block->tail_offset);
-        memcpy(temp_buf, (char*)block + block->tail_offset, offset - block->tail_offset);
-        memcpy((char*)block + block->tail_offset + size, temp_buf,
-               offset - block->tail_offset);
+    // 将前面的Item向后移动size位
+    char temp_buf[PAGE_SIZE];
+    assert(offset >= block->tail_offset);
+    memcpy(temp_buf, (char*)block + block->tail_offset, offset - block->tail_offset);
+    memcpy((char*)block + block->tail_offset + size, temp_buf, offset - block->tail_offset);
 
-        // 更新ItemID的offset, 向后移动size位
-        for (int i = 0; i < block->n_items; i++) {
-            short temp_offset = get_item_id_offset(get_item_id(block, i));
-            short temp_aval = get_item_id_availability(get_item_id(block, i));
-            if (temp_offset < offset && temp_aval == 0) {
-                short temp_size = get_item_id_size(get_item_id(block, i));
-                get_item_id(block, i) =
-                    compose_item_id(temp_aval, temp_offset + size, temp_size);
-            }
+    // 更新ItemID的offset, 向后移动size位
+    for (int i = 0; i < block->n_items; i++) {
+        short temp_offset = get_item_id_offset(get_item_id(block, i));
+        short temp_aval = get_item_id_availability(get_item_id(block, i));
+        if (temp_offset < offset && temp_aval == 0) {
+            short temp_size = get_item_id_size(get_item_id(block, i));
+            get_item_id(block, i) = compose_item_id(temp_aval, temp_offset + size, temp_size);
         }
     }
 

@@ -7,6 +7,8 @@
 #define PAGE_SIZE 128
 #define PAGE_MASK (PAGE_SIZE - 1)
 
+#define FORMAT_SIZE_T "%lu"
+
 typedef struct {
     FILE* fp;      // 文件指针
     off_t length;  // 文件长度

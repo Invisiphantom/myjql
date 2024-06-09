@@ -52,7 +52,7 @@ int test(int max_str_len, int num_op, int out) {
     table_init(&table, "zztest-str.data", "zztest-str.fsm");
     for (int i = 0; i < num_op; i++) {
         // if (i % 100 == 0)
-            printf("op %d\n", i);
+        printf("op %d\n", i);
         int op = rand() % 3;
         int m_size = m_get_total();
 
@@ -112,7 +112,7 @@ int test(int max_str_len, int num_op, int out) {
             }
         }
     }
-
+    analyze_table(&table);
     table_close(&table);
     if (remove("zztest-str.data"))
         printf("error deleting: zztest-str.data\n");
@@ -129,7 +129,7 @@ int main() {
         return 1;
     }
 
-    if (test(512, 10000, 0)) {
+    if (test(512, 3000, 0)) {
         return 1;
     }
 

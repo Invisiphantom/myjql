@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <string.h>
 
-#define MAX_ADDR_SIZE 38400
+#define MAX_ADDR_SIZE 51200
 #define MAX_DIR_PAGE MAX_ADDR_SIZE / HASH_MAP_DIR_BLOCK_SIZE
 
 // 如果哈希表已经存在，则重新打开, 否则初始化
@@ -61,6 +61,7 @@ off_t hash_table_alloc(BufferPool* pool) {
     hash_block->next = 0;
     release(pool, block_addr);  //* 释放
     release(pool, 0);           //* 释放
+    assert((block_addr & PAGE_MASK) == 0);
     return block_addr;
 }
 
