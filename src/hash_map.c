@@ -96,6 +96,7 @@ void hash_table_insert(BufferPool* pool, short size, off_t addr) {
         return;
     }
 
+    // TODO: 优化为在头部插入
     HashMapBlock* hash_block = (HashMapBlock*)get_page(pool, curAddr);  //* 锁定
     off_t tempAddr = hash_block->next;
     while (tempAddr != 0) {

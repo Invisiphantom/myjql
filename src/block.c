@@ -71,6 +71,7 @@ void delete_item(Block* block, short idx) {
     short size = get_item_id_size(item_id);
     get_item_id(block, idx) = compose_item_id(1, -1, -1);
 
+    // TODO: 优化为只在碎片过多时统一移位
     // 将前面的Item向后移动size位
     char temp_buf[PAGE_SIZE];
     assert(offset >= block->tail_offset);
