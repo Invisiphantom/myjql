@@ -15,7 +15,8 @@
     "assert.h": "c",
     "string.h": "c",
     "b_tree.h": "c",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "str.h": "c"
   },
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

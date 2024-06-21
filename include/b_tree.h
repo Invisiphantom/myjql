@@ -54,4 +54,6 @@ void b_tree_delete(BufferPool* pool,
                    b_tree_insert_nonleaf_handler_t insert_handler,
                    b_tree_delete_nonleaf_handler_t delete_handler);
 
+void b_tree_print(BufferPool* pool);
+
 #endif

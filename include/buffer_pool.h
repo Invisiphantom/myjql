@@ -3,7 +3,7 @@
 
 #include "file_io.h"
 
-#define CACHE_PAGE 16
+#define CACHE_PAGE 64
 typedef struct {
     FileInfo file; // 文件信息
     Page pages[CACHE_PAGE]; // 页数组

@@ -1,5 +1,6 @@
 #include <map>
 #include <exception>
+#include <assert.h>
 
 using namespace std;
 
@@ -14,6 +15,8 @@ extern "C" void m_init() {
 extern "C" void m_insert(my_off_t addr, short idx) {
     if (m.count(addr))
         std::terminate();
+    // if (addr == 689710555)
+    //     assert(0);
     m[addr] = idx;
 }
 

@@ -54,9 +54,11 @@ int test(int num_op, int out) {
     b_tree_init("zztest-b-tree", &pool);
     m_init();
 
-    for (int i = 0; i < num_op; ++i) {
+    for (int i = 0; i < num_op; i++) {
         int op = rand() % 3;
         RID rid, rid_get, rid_ans;
+        if(out)
+            printf("op: %d\n", i);
 
         // 插入操作
         if (op == 0) {
@@ -140,6 +142,9 @@ int test(int num_op, int out) {
                 break;
             }
         }
+
+        // if (out)
+        //     b_tree_print(&pool);
     }
 
     /* b_tree_traverse(&pool); */
@@ -167,13 +172,13 @@ int main() {
 
     srand(0);
 
-    if (test(50, 1)) {
-        return 1;
-    }
-
-    // if (test(2000000, 0)) {
+    // if (test(50, 1)) {
     //     return 1;
     // }
+
+    if (test(2000000, 1)) {
+        return 1;
+    }
 
     printf("END OF TEST\n");
     return 0;
