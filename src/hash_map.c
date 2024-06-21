@@ -39,6 +39,12 @@ void hash_table_init(const char* filename, BufferPool* pool, off_t n_directory_b
         hash_block->n_items = 0;
         release(pool, fb_i * PAGE_SIZE);  //* 释放哈希块
     }
+    // 初始化空闲块链表的末尾块
+    HashMapBlock* hash_block =
+        (HashMapBlock*)get_page(pool, MAX_DIR_PAGE * PAGE_SIZE);  //* 锁定哈希块
+    hash_block->next = -1;
+    hash_block->n_items = 0;
+    release(pool, MAX_DIR_PAGE * PAGE_SIZE);  //* 释放哈希块
 }
 
 // 关闭哈希表
@@ -51,7 +57,7 @@ void hash_table_close(BufferPool* pool) {
 // 从空闲块链表中分配一个块
 off_t hash_table_alloc(BufferPool* pool) {
     HashMapControlBlock* ctrl = (HashMapControlBlock*)get_page(pool, 0);  //* 锁定
-    if (ctrl->free_block_head == 0) {  // 如果没有空闲块
+    if (ctrl->free_block_head == -1) {  // 如果没有空闲块
         fprintf(stderr, "No free block\n");
         assert(0);
     }
